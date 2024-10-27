@@ -8,7 +8,7 @@ EmergencyCallCenter is designed to manage emergency call responses efficiently. 
 
 - Efficient management of emergency calls 📞
 - UML modeling with Astah Professional 📊
-- Back-end development in Java using Apache NetBeans 💻
+- Back-end development in Java using Apache NetBeans IDE 18 💻
 - Implementation of DAO-DTO design patterns for data access 🛠️
 
 ## Technologies Used ☕
@@ -16,7 +16,7 @@ EmergencyCallCenter is designed to manage emergency call responses efficiently. 
 - **Astah Professional**: For UML modeling and system design.
 - **Java**: The primary programming language for back-end development.
 - **Apache NetBeans**: IDE used for development and debugging.
-- **Design Patterns**: Utilizing DAO and DTO for effective database interaction.
+- **Design Patterns**: Utilizing DAO and DTO for effective database interaction. Other design patterns have been applied such as Singleton and others.
 
 ## Installation and Setup ⚙️
 
