@@ -1,0 +1,623 @@
+-- Reset database
+--Derby does not support DROP TABLE IF EXISTS 
+
+DROP TABLE PROCEDIMIENTOS;
+DROP TABLE INCOMPATIBILIDADESDEPROCEDIMIENTOS;
+DROP TABLE PROCEDIMIENTOSQUESUELENAPLICARSEJUNTOS;
+DROP TABLE DESCRIPCIONESDEPROCEDIMIENTOS;
+DROP TABLE CONSEJOS;
+DROP TABLE LLAMADASNOCRITICAS;
+DROP TABLE ACTIVACIONESDEOPERATIVOS;
+DROP TABLE DECISIONESDETRASLADOAHOSPITAL;
+DROP TABLE HOSPITALES;
+DROP TABLE OPERATIVOS;
+DROP TABLE LLAMADASCRITICAS;
+DROP TABLE LLAMADASDEASEGURADOS;
+DROP TABLE LLAMADASINFUNDADAS;
+DROP TABLE LLAMADAS;
+DROP TABLE POLIZASCONTRATADAS;
+DROP TABLE POLIZAS;
+DROP TABLE CONDUCTORESENTURNO;
+DROP TABLE MEDICOSENTURNO;
+DROP TABLE TURNOSDEOPERATIVO;
+DROP TABLE OPERADORESENTURNO;
+DROP TABLE TURNOSDEOPERADOR;
+DROP TABLE CONSULTORIOS;
+DROP TABLE VEHICULOS;
+DROP TABLE MODELOS;
+DROP TABLE MARCAS;
+
+DROP TABLE ESTADOSDEVEHICULO;
+DROP TABLE ESTADOSDEOPERATIVO;
+DROP TABLE TIPOSDETURNODEOPERATIVO;
+DROP TABLE TIPOSDETURNODEOPERADOR;
+
+DROP TABLE DISPONIBILIDADES;
+DROP TABLE VINCULACIONESCONLAEMPRESA;
+DROP TABLE ROLESENEMPRESA;
+DROP TABLE TIPOSDEDISPONIBILIDAD;
+DROP TABLE TIPOSDEVINCULACION;
+DROP TABLE TIPOSDEROL;
+DROP TABLE EMPLEADOS;
+DROP TABLE ASEGURADOS;
+DROP TABLE PERSONAS;
+
+DROP TABLE DIRECCIONES;
+
+-- Datatype
+create table DIRECCIONES
+(
+	Id SMALLINT not null,
+	NombreDeLaVia VARCHAR(20) not null,
+	Numero SMALLINT,
+	Otros VARCHAR(20),
+	CodigoPostal INT not null,
+	Localidad VARCHAR(20) not null,
+	Provincia VARCHAR(20) not null,
+		PRIMARY KEY(Id)
+);
+
+-- Entity
+create table PERSONAS
+(
+	Nif VARCHAR(9) not null primary key,
+	Nombre VARCHAR(50) not null,
+	Apellidos VARCHAR(50) not null,
+	FechaDeNacimiento DATE not null,
+	Telefono VARCHAR(12) not null,
+	DireccionPostal SMALLINT not null,
+		FOREIGN KEY(DireccionPostal) REFERENCES DIRECCIONES(Id)
+);
+
+--Entity
+create table ASEGURADOS
+(
+	Nif VARCHAR(9) not null primary key,
+	Sexo CHAR not null,
+	numeroDeCuenta VARCHAR(24) not null,
+	    FOREIGN KEY(Nif) REFERENCES PERSONAS(Nif)
+);
+
+-- Entity
+create table EMPLEADOS
+(
+	Nif VARCHAR(9) not null primary key,
+	FechaInicioEnEmpresa DATE not null,
+	Password VARCHAR(10) not null,
+            FOREIGN KEY(Nif) REFERENCES PERSONAS(Nif)
+);
+
+-- Enum
+create table TIPOSDEROL
+(
+	IdTipo SMALLINT not null,
+	NombreTipo VARCHAR(20) not null unique,
+		PRIMARY KEY(IdTipo)
+);
+
+INSERT INTO TIPOSDEROL
+VALUES  (1,'Gerente'),
+        (2,'Operador'),
+        (3,'Médico'),
+        (4,'Conductor');
+
+-- Enum
+create table TIPOSDEVINCULACION
+(
+	IdTipo SMALLINT not null,
+	NombreTipo VARCHAR(20) not null unique,
+		PRIMARY KEY(IdTipo)
+
+);
+
+INSERT INTO TIPOSDEVINCULACION
+VALUES  (1,'ConNormalidad'),
+        (2,'FueraDeLaEmpresa'),
+        (3,'EnERTE');
+
+-- Enum
+create table TIPOSDEDISPONIBILIDAD
+(
+	IdTipo SMALLINT not null,
+	NombreTipo VARCHAR(20) not null unique,
+		PRIMARY KEY(IdTipo)
+);
+
+INSERT INTO TIPOSDEDISPONIBILIDAD
+VALUES  (1,'DeVacaciones'),
+        (2,'DeBaja'),
+	(3, 'Disponible');
+
+
+-- Association
+create table ROLESENEMPRESA
+(
+	FechaInicioEnPuesto DATE not null,
+	Empleado VARCHAR(9) not null,
+	FechaPermisoConduccion DATE,
+	NumeroColegiadoMedico VARCHAR(9),
+	Rol SMALLINT not null,
+            FOREIGN KEY(Empleado) REFERENCES EMPLEADOS(Nif),
+            FOREIGN KEY(Rol) REFERENCES TIPOSDEROL(IdTipo)
+);
+
+-- Association
+create table VINCULACIONESCONLAEMPRESA
+(
+	FechaInicio DATE not null,
+	FechaFin Date,
+	Empleado VARCHAR(9) not null,
+	Vinculo SMALLINT not null,
+		FOREIGN KEY(Empleado) REFERENCES EMPLEADOS(Nif),
+		FOREIGN KEY(Vinculo) REFERENCES TIPOSDEVINCULACION(IdTipo) 
+);
+
+-- Association
+create table DISPONIBILIDADES
+(
+	FechaInicio DATE not null,
+	FechaFin DATE,
+	Empleado VARCHAR(9) not null,
+	Disponibilidad SMALLINT not null,
+		FOREIGN KEY(Empleado) REFERENCES EMPLEADOS(Nif),
+		FOREIGN KEY(Disponibilidad) REFERENCES TIPOSDEDISPONIBILIDAD(IdTipo)
+);
+
+--Enum 
+create table TIPOSDETURNODEOPERATIVO (
+	IdTipo SMALLINT not null,
+	NombreTipo VARCHAR(20) not null unique,
+		PRIMARY KEY(IdTipo)
+
+);
+
+INSERT INTO TIPOSDETURNODEOPERATIVO
+VALUES (1,'DeDia7'),
+       (2,'DeNoche19');
+
+--Enum 
+create table TIPOSDETURNODEOPERADOR (
+	IdTipo SMALLINT not null,
+	NombreTipo VARCHAR(20) not null unique,
+		PRIMARY KEY(IdTipo)
+);
+
+INSERT INTO TIPOSDETURNODEOPERADOR 
+VALUES (1,'DeMañana7'),
+       (2,'DeTarde15'),
+       (3,'DeNoche23');
+
+--Enum 
+create table ESTADOSDEOPERATIVO (
+	IdEstado SMALLINT not null,
+	NombreEstado VARCHAR(20) not null unique,
+		PRIMARY KEY(IdEstado)
+);
+
+INSERT INTO ESTADOSDEOPERATIVO 
+VALUES (1,'disponible'),
+       (2,'activado'),
+       (3,'bloqueado');
+
+--Enum 
+create table ESTADOSDEVEHICULO (
+	IdEstado SMALLINT not null,
+	NombreEstado VARCHAR(20) not null unique,
+		PRIMARY KEY(IdEstado)
+);
+
+INSERT INTO ESTADOSDEVEHICULO
+VALUES (1,'enServicio'),
+       (2,'enTaller'),
+       (3,'deBaja');
+
+create table MARCAS (
+	Id SMALLINT not null,
+	Nombre VARCHAR(20) not null unique,
+		PRIMARY KEY(Id)
+);
+
+create table MODELOS (
+	Id SMALLINT not null,
+	Nombre VARCHAR(20) not null,
+	Marca SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Marca) REFERENCES MARCAS(Id)
+);
+
+create table VEHICULOS (
+	Matricula VARCHAR(8) not null,
+	UbicacionLatitud REAL not null,
+	UbicacionLongitud REAL not null,
+	FechaAlta DATE not null,
+	Estado SMALLINT not null,
+	Modelo SMALLINT not null,
+		PRIMARY KEY(Matricula),
+		FOREIGN KEY(Estado) REFERENCES ESTADOSDEVEHICULO(IdEstado),
+		FOREIGN KEY(Modelo) REFERENCES MODELOS(Id)
+);
+
+create table CONSULTORIOS (
+	Id SMALLINT not null,
+	Direccion SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Direccion) REFERENCES DIRECCIONES(Id)
+);
+
+create table TURNOSDEOPERADOR (
+	Id INT not null,
+	FechaTurno DATE not null,
+	FechaCreacion DATE not null,
+	TipoDeTurno SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(TipoDeTurno) REFERENCES TIPOSDETURNODEOPERADOR(IdTipo)
+
+);
+
+create table OPERADORESENTURNO (
+	Turno INT not null,
+	Operador VARCHAR(9) not null,
+		PRIMARY KEY(Turno,Operador),
+		FOREIGN KEY(Turno) REFERENCES TURNOSDEOPERADOR(Id),
+		FOREIGN KEY(Operador) REFERENCES EMPLEADOS(Nif)
+);
+
+create table TURNOSDEOPERATIVO (
+	Id INT not null,
+	FechaTurno DATE not null,
+	FechaCreacion DATE not null,
+	TipoDeTurno SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(TipoDeTurno) REFERENCES TIPOSDETURNODEOPERATIVO(IdTipo)
+);
+
+create table MEDICOSENTURNO (
+	Turno INT not null,
+	Medico VARCHAR(9) not null,
+		PRIMARY KEY(Turno,Medico),
+		FOREIGN KEY(Turno) REFERENCES TURNOSDEOPERATIVO(Id),
+		FOREIGN KEY(Medico) REFERENCES EMPLEADOS(Nif)
+);
+
+create table CONDUCTORESENTURNO (
+	Turno INT not null,
+	Conductor VARCHAR(9) not null,
+		PRIMARY KEY(Turno,Conductor),
+		FOREIGN KEY(Turno) REFERENCES TURNOSDEOPERATIVO(Id),
+		FOREIGN KEY(Conductor) REFERENCES EMPLEADOS(Nif)
+);
+
+create table POLIZAS (
+	NumeroPoliza VARCHAR(15) not null,
+	FechaInicio DATE not null,
+	FechaVencimiento DATE not null,
+		PRIMARY KEY(NumeroPoliza)
+);
+
+create table POLIZASCONTRATADAS (
+	Asegurado VARCHAR(9) not null,
+	Poliza VARCHAR(15) not null,
+		PRIMARY KEY(Asegurado,Poliza),
+		FOREIGN KEY(Asegurado) REFERENCES ASEGURADOS(Nif),
+		FOREIGN KEY(Poliza) REFERENCES POLIZAS(NumeroPoliza)
+);
+
+
+create table LLAMADAS (
+	Id INT not null,
+	NumeroTelefonoOrigen VARCHAR(12) not null,
+	FechaInicio DATE not null,
+	HoraInicio TIME not null,
+	FechaFin DATE not null,
+	HoraFin TIME not null,
+	NombreComunicante VARCHAR(100) not null,
+	AtendidaPor VARCHAR(9) not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(AtendidaPor) REFERENCES EMPLEADOS(Nif)
+);
+
+create table LLAMADASINFUNDADAS (
+	Id INT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Id) REFERENCES LLAMADAS(Id)
+);
+
+create table LLAMADASDEASEGURADOS (
+	Id INT not null,
+	DescripcionDeLaEmergencia VARCHAR(255) not null,
+	Paciente VARCHAR(9) not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Id) REFERENCES LLAMADAS(Id),
+		FOREIGN KEY(Paciente) REFERENCES ASEGURADOS(Nif)
+);
+
+create table LLAMADASCRITICAS (
+	Id INT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Id) REFERENCES LLAMADAS(Id)
+);
+
+create table OPERATIVOS (
+	Id INT not null,
+	FechaCreacion DATE not null,
+	Estado SMALLINT not null,
+	Turno INT not null,
+	Base SMALLINT not null,
+	Vehiculo VARCHAR(8) not null,
+	Conductor VARCHAR(9) not null,
+	Medico VARCHAR(9) not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Estado) REFERENCES ESTADOSDEOPERATIVO(IdEstado),
+		FOREIGN KEY(Turno) REFERENCES TURNOSDEOPERATIVO(Id),
+		FOREIGN KEY(Base) REFERENCES CONSULTORIOS(Id),
+		FOREIGN KEY(Vehiculo) REFERENCES VEHICULOS(Matricula),
+		FOREIGN KEY(Conductor) REFERENCES EMPLEADOS(Nif),
+		FOREIGN KEY(Medico) REFERENCES EMPLEADOS(Nif)
+);
+
+create table HOSPITALES (
+	Id SMALLINT not null,
+	Nombre VARCHAR(50) not null,
+	Direccion SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(Direccion) REFERENCES DIRECCIONES(Id)
+);
+
+create table DECISIONESDETRASLADOAHOSPITAL (
+	Id INT not null,
+	FechaInicioTraslado DATE not null,
+	HoraInicioTraslado TIME not null,
+	DestinoDeTraslado SMALLINT not null,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(DestinoDeTraslado) REFERENCES HOSPITALES(Id)
+);
+
+create table ACTIVACIONESDEOPERATIVOS (
+	Id INT not null,
+	DireccionDondeAcudir SMALLINT not null,
+	FechaActivación DATE not null,
+	HoraActivación TIME not null,
+	OperativoActivado INT not null,
+	FechaSeHaceCargoMedico DATE,
+	HoraSeHaceCargoMedico TIME,
+	FechaCierre DATE,
+	HoraCierre TIME,
+	DecisionTrasladoAHospital INT,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(DireccionDondeAcudir) REFERENCES DIRECCIONES(Id),
+		FOREIGN KEY(DecisionTrasladoAHospital) REFERENCES DECISIONESDETRASLADOAHOSPITAL(Id)
+);
+
+create table LLAMADASNOCRITICAS (
+	Id INT not null,
+	EsLeve BOOLEAN not null,
+	RequiereOperativo INT,
+		PRIMARY KEY(Id),
+		FOREIGN KEY(RequiereOperativo) REFERENCES ACTIVACIONESDEOPERATIVOS(Id)
+);
+
+create table CONSEJOS (
+	Descripcion VARCHAR(255) not null,
+	Resultado VARCHAR(255) not null,
+	Soluciona BOOLEAN not null,
+	Llamada INT not null,
+		FOREIGN KEY(Llamada) REFERENCES LLAMADASNOCRITICAS(Id)
+);
+
+create table DESCRIPCIONESDEPROCEDIMIENTOS (
+	Id SMALLINT not null,
+	Nombre VARCHAR(50) not null,
+	Descripcion VARCHAR(255) not null,
+	Variantes VARCHAR(255) not null,
+		PRIMARY KEY(Id)
+);
+
+create table PROCEDIMIENTOSQUESUELENAPLICARSEJUNTOS (
+	Id1 SMALLINT not null,
+	Id2 SMALLINT not null,
+		PRIMARY KEY(Id1,Id2),
+		FOREIGN KEY(Id1) REFERENCES DESCRIPCIONESDEPROCEDIMIENTOS(Id),
+		FOREIGN KEY(Id2) REFERENCES DESCRIPCIONESDEPROCEDIMIENTOS(Id)
+);
+
+create table INCOMPATIBILIDADESDEPROCEDIMIENTOS (
+	Id1 SMALLINT not null,
+	Id2 SMALLINT not null,
+		PRIMARY KEY(Id1,Id2),
+		FOREIGN KEY(Id1) REFERENCES DESCRIPCIONESDEPROCEDIMIENTOS(Id),
+		FOREIGN KEY(Id2) REFERENCES DESCRIPCIONESDEPROCEDIMIENTOS(Id)
+);
+
+create table PROCEDIMIENTOS (
+	ResultadoObservado VARCHAR(255) not null,
+	FechaInicio DATE not null,
+	HoraInicio TIME not null,
+	Descripcion SMALLINT not null,
+	SeAplicaEn INT not null,
+		FOREIGN KEY(Descripcion) REFERENCES DESCRIPCIONESDEPROCEDIMIENTOS(Id),
+		FOREIGN KEY(SeAplicaEn) REFERENCES ACTIVACIONESDEOPERATIVOS(Id)
+);
+
+
+
+-- POBLAR BASE DE DATOS --
+
+INSERT INTO DIRECCIONES (Id,NombreDeLaVia,Numero,Otros,CodigoPostal,Localidad,Provincia) VALUES
+    (7140, 'Esla', 8, 'Piso 3 A', 47140, 'Laguna de duero', 'Valladolid'),
+    (7141, 'Bandurria', 5, 'Cada de Maderas', 45321, 'Renedo', 'Valladolid'),
+    (7110, 'Serrano', 5, 'Atico b', 23453, 'Campus', 'Valladolid'),
+    (7142, 'Camiño Toledo', 1, 'Piso 1 B', 32410, 'El Piñeiro', 'Ribeiro'),
+    (7143, 'Praza Olivia', 200, '54º D', 08570, 'Noa Cadena', 'Ribeiro');
+
+INSERT INTO PERSONAS (Nif, Nombre, Apellidos, FechaDeNacimiento, Telefono, DireccionPostal) VALUES
+    --Empleados
+    ('71188761N', 'Victor', 'Calleja Garcia', '2002-12-8', '655133079', 7140),
+    ('11111111A', 'Asier', 'Palomares García', '1999-10-1', '657875445', 7141),
+    ('12345678E', 'Nicolás', 'Reyes González', '2001-11-12', '678341976', 7110),
+    ('98765432A', 'Mario', 'Ronaldo Gaspar', '1982-6-3', '609345678', 7142),
+    ('85734850A', 'Sandra', 'Gutiérrez Zuñiga', '1972-4-27', '621834177', 7143),
+    ('77777777A', 'John', 'Marston Zhar', '1970-1-7', '622324177', 7141),
+    ('42056696A', 'Arthur', 'Morgan Dutch', '1942-8-22', '621777177', 7110),
+    ('34676657E', 'Isabel', 'Maria Peña', '1974-2-12', '683482852', 7140),
+    ('12579865N', 'Gumersindo', 'Bernabeu', '1960-3-1', '683285483', 7143),
+    ('42042042O', 'Malenia', 'Gonzalo', '1999-3-1', '655343264', 7140),
+    ('21457574D', 'Edgar', 'Andrade', '1991-4-21', '655343264', 7142),
+    ('47846834E', 'Atalo', 'Vigil Gil', '1967-11-6', '618368818', 7140),
+    ('56908346A', 'Martzel', 'Adomo Hernandes', '1980-10-14', '793776464', 7141),
+    --Asegurados
+    ('46512345E', 'Roberto', 'Dimitri Masuco', '1968-1-23', '607123456', 7110),
+    ('37457694F', 'Maria ', 'Sagrario Botellao', '1989-12-31', '694739596', 7142);
+
+INSERT INTO EMPLEADOS (Nif, FechaInicioEnEmpresa, Password) VALUES 
+    ('71188761N', '2020-5-22', 'SekiroHit'), -- CONDUCTOR CON ACTIVACIONES
+    ('98765432A', '2016-8-12', '098'),  -- MÉDICO CON ACTIVACIONES
+    ('77777777A', '1999-1-12', 'Wapo'), -- CONDUCTOR CON OPERATIVO SIN ACTIVACIONES CON MÉDICO NO ACTIVO
+    ('42056696A', '2011-8-12', 'Queso123'), --MÉDICO NO ACTIVO QUE PARTICIPÓ EN OPERATIVOS
+    ('21457574D', '2012-5-9', '45676'), --MÉDICO QUE NO HA PERTENECIDO A NINGÚN OPERATIVO
+    ('85734850A', '2012-5-25', '098'),  -- GERENTE
+
+    ('11111111A', '2021-1-8', '123'), -- OPERADOR CU3
+    ('34676657E', '2019-3-3', '123'), -- OPERADOR CU3
+    ('12579865N', '2012-3-18', '123'), -- OPERADOR CU3
+    ('47846834E', '2012-3-4', '123'), -- OPERADOR CU3
+    ('56908346A', '2012-3-5', '123'), -- OPERADOR CU3
+
+    ('12345678E', '2010-10-10', 'gato123'), -- OPERADOR CU3 NO DISPONIBILIDAD DE BAJA
+    
+    ('42042042O', '2002-4-1', 'S3K1R0');--Operador que va a tener turno actual
+
+-- 1 -> Gerente, 2 -> Operador 3 ->Médico 4 -> Conductor
+INSERT INTO ROLESENEMPRESA (FechaInicioEnPuesto,Empleado,Rol,FechaPermisoConduccion,NumeroColegiadoMedico) VALUES
+    ('2020-5-22', '71188761N', 2, null, null),
+    ('2021-3-13', '71188761N', 4, '2020-12-20', null),
+    ('2016-8-12', '98765432A', 3, null, '12345'),
+    ('2013-8-2', '77777777A', 4, null, '12325'),
+    ('2023-5-2', '42042042O', 2, null, null),
+    ('2012-5-11', '21457574D', 3, null, '24676'),
+    ('2012-5-30', '85734850A', 1, '2008-7-23', '09876'),
+
+    ('2021-6-3', '11111111A', 2, null, null),
+    ('2019-3-5', '34676657E', 2, null, null),
+    ('2012-3-7', '12579865N', 2, null, null),
+    ('2013-12-4', '47846834E', 2, null, null),
+    ('2013-12-4', '56908346A', 2, null, null),
+    ('2021-8-23', '12345678E', 1, '2020-11-25', null),
+    ('2022-4-11', '12345678E', 2, '2020-11-25', null),
+    
+    ('2011-9-21', '42056696A',3 , null, '17775');
+    
+-- 1 -> ConNormalidad 2 -> FueraDeLaEmpresa 3 -> EnERTE
+INSERT INTO VINCULACIONESCONLAEMPRESA (FechaInicio,FechaFin,Empleado,Vinculo) VALUES    
+    ('2020-5-23', null, '71188761N', 1),
+    ('2016-8-13', null, '98765432A', 1),
+    ('2013-8-14', null, '77777777A', 1),
+    ('2012-3-1', null, '42042042O', 1),
+    ('2012-5-13', null, '21457574D', 1),
+    ('2012-5-29', null, '85734850A', 1),
+
+    ('2021-1-8', '2022-3-12', '11111111A', 1),
+    ('2022-3-13', null, '11111111A', 1),
+    ('2019-3-6', null, '34676657E', 1),
+    ('2012-3-9', null, '12579865N', 1),
+    ('2014-4-5', null, '47846834E', 1),
+    ('2020-3-21', null, '56908346A', 1),
+    ('2010-10-11', '2013-11-23', '12345678E', 1),
+    ('2013-11-24', null, '12345678E', 1),
+    
+    ('2011-9-29', null, '42056696A', 1);
+   
+-- VALUES 1 -> DeVacaciones 2 -> DeBaja 3 -> Disponible
+INSERT INTO DISPONIBILIDADES (FechaInicio,FechaFin,Empleado,Disponibilidad) VALUES
+    ('2021-5-3', '2021-8-11', '71188761N', 2),
+    ('2022-3-12', null, '71188761N', 3),
+    ('2018-8-13', '2019-8-13', '98765432A', 2),
+    ('2019-5-21', null, '98765432A', 3),
+    ('2013-8-12', null, '77777777A', 3),
+    ('2017-4-21', null, '42042042O', 3),
+    ('2012-5-12', null, '21457574D', 3),
+    ('2012-5-27', '2016-5-23', '85734850A', 3),
+    ('2016-7-1', '2017-2-18', '85734850A', 1),
+    ('2018-12-3', null, '85734850A', 3),
+
+    ('2022-1-30', null, '11111111A', 3),
+    ('2019-3-10', null, '34676657E', 3),
+    ('2012-3-12', null, '12579865N', 3),
+    ('2014-5-23', null, '47846834E', 3),
+    ('2011-3-7', null, '56908346A', 3),
+    ('2011-6-12', null, '12345678E', 2),
+
+    ('2011-9-27', '2013-3-25', '42056696A', 3),
+    ('2015-2-18', null, '42056696A', 2);
+    
+INSERT INTO TURNOSDEOPERATIVO (id, FechaTurno, FechaCreacion, TipoDeTurno) VALUES
+    (4, '2021-12-18', '2021-12-1', 2),
+    (2,'2020-11-4','2020-11-1',1);
+
+INSERT INTO TURNOSDEOPERADOR (id, FechaTurno, FechaCreacion, TipoDeTurno) VALUES
+    (1, '2024-9-1', '2021-8-25', 2),
+    (2,'2024-9-2','2021-8-27',2),
+    (4,'2024-9-2','2021-8-27',1),
+    (3, '2024-7-1', '2023-4-24', 2); -- Turno de operador actual.
+
+INSERT INTO OPERADORESENTURNO (Turno, Operador) VALUES
+    (1, '11111111A'),
+    (1, '34676657E'),
+    (4, '12579865N'),
+    (4, '56908346A'),
+    (2, '47846834E'),
+
+    (3, '42042042O'); --Actual
+
+INSERT INTO CONSULTORIOS (id, Direccion) VALUES
+    (2, 7140),
+    (7, 7141);
+
+INSERT INTO MARCAS (Id, Nombre) VALUES
+    (7, 'Renault'),
+    (2,'Aston Martin');
+
+INSERT INTO MODELOS (Id, Nombre, Marca) VALUES
+    (12, 'Laguna', 7),
+    (7,'Valkyre',2);
+
+INSERT INTO VEHICULOS (Matricula, UbicacionLatitud, UbicacionLongitud, FechaAlta, Estado, Modelo) VALUES
+    ('12345V', 14, 1, '2013-9-11', 1, 12),
+    ('77777V',13,2,'1999-1-2',1,7);
+
+INSERT INTO OPERATIVOS (id, FechaCreacion, Estado, Turno, Base, Vehiculo, Conductor, Medico) VALUES
+    (1, '2012-6-2', 1, 4, 2, '12345V', '71188761N', '98765432A'),
+    (2, '2010-3-12', 1, 2, 7, '77777V', '77777777A', '42056696A');
+
+INSERT INTO HOSPITALES (Id, Nombre , Direccion) VALUES
+    (34, 'Rio Hortega', 7143);
+
+INSERT INTO DECISIONESDETRASLADOAHOSPITAL (Id, FechaInicioTraslado , HoraInicioTraslado, DestinoDeTraslado) VALUES
+    (12, '2022-8-10', '11:45:16', 34);
+
+INSERT INTO ACTIVACIONESDEOPERATIVOS (Id, DireccionDondeAcudir, FechaActivación, HoraActivación, OperativoActivado, FechaSeHaceCargoMedico, HoraSeHaceCargoMedico, FechaCierre, HoraCierre, DecisionTrasladoAHospital ) VALUES
+    (23457, 7141, '2021-8-7', '12:23:45', 1, null, null, null, null, null),
+    (77777, 7140, '2022-8-5', '13:32:12', 1, '2022-8-7', '19:30:28', null, null, 12);
+
+INSERT INTO LLAMADAS (Id, NumeroTelefonoOrigen, FechaInicio, HoraInicio, FechaFin, HoraFin, NombreComunicante, AtendidaPor) VALUES
+    (1, '675342123', '2020-10-13', '12:30:24', '2020-10-13', '17:12:56', 'Pedro', '11111111A'),
+    (2, '694739596', '2022-11-14', '20:34:12', '2022-11-17', '18:23:45', 'Maria', '11111111A');
+
+INSERT INTO ASEGURADOS (Nif, Sexo, NumeroDeCuenta) VALUES
+    ('46512345E', 'H', '12334565434412345678E'),
+    ('37457694F', 'M', '45789456783459026984E');
+
+INSERT INTO LLAMADASDEASEGURADOS (Id, DescripcionDeLaEmergencia , Paciente) VALUES
+    (1, 'Rotura ligamento cruzado', '46512345E'),
+    (2, 'Persona atropellada', '37457694F');
+
+INSERT INTO LLAMADASNOCRITICAS (Id, EsLeve , RequiereOperativo) VALUES
+    (1, false, 23457),
+    (2, true, 77777);
+
+INSERT INTO POLIZAS (NumeroPoliza, FechaInicio, FechaVencimiento) VALUES 
+    ('PZ1234567890124', '2024-02-01', '2025-02-01'),
+    ('PZ1234567890125', '2024-03-01', '2025-03-01');
+
+INSERT INTO POLIZASCONTRATADAS (Asegurado, Poliza) VALUES
+    ('46512345E', 'PZ1234567890124'),
+    ('37457694F', 'PZ1234567890125');

@@ -1,0 +1,187 @@
+Caso de uso 1
+
+    Prueba1
+        Entrada: DNI y contraseña vacia
+        Resultado: "Nif campo vacio"
+
+    Prueba2
+        Entrada: DNI vacio y contraseña no vacia
+        Resultado: "Nif campo vacio"
+
+    Prueba3
+        Entrada: DNI no vacio y contraseña vacia
+        Resultado: "Password campo vacio"
+    
+    Prueba4
+        Entrada: DNI no existente en la base de datos 
+        Resultado: "No existe empleado"
+
+    Prueba5
+        Entrada: DNI existente en la base de datos y la contraseña no es correcta.
+        Resultado: "No existe empleado"
+
+    Prueba6
+        Entrada: DNI existente en la base de datos, contraseña correcta y empleado no activo.
+        Resultado: "El empleado no está activo"
+
+    Prueba7
+        Entrada: DNI existente en la base de datos, contraseña correcta, empleado activo y rol actual Médico.
+        Resultado: Se muestra la vista VistaOperativo
+
+    Prueba8
+        Entrada: DNI existente en la base de datos, contraseña correcta, empleado activo y rol acutal Conductor.
+        Resultado: Se muestra la vista VistaOperativo
+    
+    Prueba9
+        Entrada: DNI existente en la base de datos, contraseña correcta, empleado activo y rol acutual Gerente.
+        Resultado: Se muestra la vista VistaGerente
+    
+    Prueba10
+        Entrada: DNI existente en la base de datos, contraseña correcta, empleado activo y rol acutual Operador.
+        Resultado: Se muestra la vista VistaOperador
+
+Caso de uso 2
+    
+    Prueba1 
+        Entrada: Fecha en la que el operativo tiene turno, pero no tiene ninguna activación registrada.
+        Resultado: No se muestra nada
+
+    Prueba2 
+        Entrada: El médico o conductor no ha pertenecido a operativos.
+        Resultado: "No existe turno en la fecha seleccionada"
+
+    Prueba3
+        Entrada: Fecha en la que el operativo no tiene turno.
+        Resultado: "No existe turno en la fecha seleccionada"
+
+    Prueba4
+        Entrada: Fecha que no es válida.
+        Resultado: "Fecha no válida"
+
+    Prueba5
+        Entrada: Se pulsa el botón mostrar detalles sin selecionar nada.
+        Resultado: No pasa nada
+
+    Prueba6
+        Entrada: Fecha en la que el operativo tiene turno, se selecciona una emergencia y se pulsa en mostrar detalles. Se utiliza el filtro de todos.
+        Resultado: Se muestra la fecha y hora de la emergencia, su descripción, donde se acudió, fecha y hora de cuando se hizo cargo del paciente y si hubo traslado.
+                   El formato puede variar dependiendo de los datos almacenados.
+
+    Prueba7
+        Entrada: Fecha en la que el operativo tiene turno, se selecciona una emergencia y se pulsa en mostrar detalles. Se utiliza el filtro de sin traslado.
+        Resultado: Se muestra la fecha y hora de la emergencia, su descripción, donde se acudió, fecha y hora de cuando se hizo cargo del paciente y si hubo traslado.
+                   El formato puede variar dependiendo de los datos almacenados.
+                   En los detalles mostrados siempre debe indicar que no hubo traslado.
+    
+    Prueba8
+        Entrada: Fecha en la que el operativo tiene turno, se selecciona una emergencia y se pulsa en mostrar detalles. Se utiliza el filtro de con traslado.
+        Resultado: Se muestra la fecha y hora de la emergencia, su descripción, donde se acudió, fecha y hora de cuando se hizo cargo del paciente y si hubo traslado.
+                   El formato puede variar dependiendo de los datos almacenados.
+                   En los detalles mostrados siempre debe indicar que sí hubo traslado.
+
+Caso de uso 3
+    
+    Prueba1
+        Entrada: Fecha que no tenga una diferencia de 15 días en el futuro.
+        Resultado: "Solo se pueden modificar turnos con diferencia de 15 días"
+
+    Prueba2
+        Entrada: Fecha que no es válida.
+        Resultado: "Fecha no válida"
+    
+    Prueba3
+        Entrada: Fecha válida, pero no hay turno para esa fecha.
+        Resultado: "No existe ningún turno a modificar en la fecha seleccionada"
+
+    Prueba4
+        Entrada: Fecha válida, y hay turno para esa fecha pero no hay operadores activos para modificarlo.
+        Resultado: "No hay operadores activos para modificar el actual"
+
+    Prueba5
+        Entrada: Un operador que cumpla todas las condiciones para poder sustituir al operador seleccionado del turno.
+        Resultado: Aparace en la lista.
+
+    Prueba6
+        Entrada: Un operador que no cumpla todas las condiciones para poder sustituir al operador seleccionado del turno.
+                 (Probar cada condición por separado)
+        Resultado: No aparece en la lista.
+
+    Prueba7
+        Entrada: Fecha válida, hay turno para esa fecha, selecciona un operador activo para cambiar y confirma.
+        Resultado: "Cambio efectuado con éxito".
+    
+    Prueba8
+        Entrada: Fecha válida, hay turno para esa fecha, selecciona un operador activo para cambiar y confirma. Pero hay un error en la bd.
+                 (No debería pasar)
+        Resultado: "No se pudo realizar el cambio"
+    
+    Prueba9
+        Entrada: Se pulsa el botón modificar sin seleccionar ningún operador.
+        Resultado: No pasa nada.
+
+    Prueba10
+        Entrada: Se pulsa el botón confirmar sin seleccionar ningún operador.
+        Resultado: No pasa nada.
+
+Caso de uso 4
+
+    Prueba1
+        Entrada: El operador que intenta registrar la llamada no se encuentra en turno.
+        Resultado: "Operador no se encuentra en turno"
+    
+    Prueba2
+        Entrada: El número de teléfono tiene más de 12 carácteres. Comprobación para evitar problemas con insert en la bd.
+        Resultado: "Número de telefono demasiado largo"
+    
+    Prueba3
+        Entrada: El nombre del comunicante tiene más de 100 carácteres. Comprobación para evitar problemas con insert en la bd.
+        Resultado: "Nombre del comunicante demasiado largo"
+
+    Prueba4
+        Entrada: Algún campo del formulario no se ha rellenado.
+        Resultado: "Se deben rellenar todos los campos"
+    
+    Prueba5
+        Entrada: No existe ningún asegurado que se corresponda con los datos introducidos.
+        Resultado: "Ningún asegurado coincide con los datos introducidos, se debe redirigir la llamada al 112. Llamada infundada creada"
+                    Se crea la llamada infundada y el sistema se prepara para registrar otra llamada.
+
+    Prueba6
+        Entrada: Si existe un asegurado que se corresponda con los datos introducidos, pero no tiene contratada la poliza indicada, o esta no existe.
+        Resultado: "Ningún asegurado coincide con los datos introducidos, se debe redirigir la llamada al 112. Llamada infundada creada"
+                    Se crea la llamada infundada y el sistema se prepara para registrar otra llamada.
+
+    Prueba7
+        Entrada: Se introduce una fecha no válida como fecha de nacimiento.
+        Resultado: "Fecha no válida"
+
+    Prueba8
+        Entrada: No se ha introducido descripción de la emergencia.
+        Resultado: "Se debe indicar una descripción"
+    
+    Prueba9
+        Entrada: Se introduce descripción y se marca que es crítica.
+        Resultado: "Llamada crítica creada". Se crea la llamada crítica y el sistema se prepara para registrar otra llamada.
+
+    Prueba10
+        Entrada: No se introduce consejo o resultado de este.
+        Resultado: "Se debe indicar el consejo con su resultado"
+
+    Prueba11
+        Entrada: Se marca que se resuelve la llamada y que se requiere operativo y se registra el consejo.
+        Resultado: "No se puede activar un operativo al mismo tiempo que se resuelve la emergencia"
+    
+    Prueba12
+        Entrada: Se marca se resuleve la llamada y se resgistra el consejo.
+        Resultado: "Llamada no crítica creada"
+                    Se crea la llamada no crítica como esLeve = true y el sistema se prepara para registrar otra llamada.
+
+    Prueba13
+        Entrada: Se marca requiere operativo y se resgistra el consejo.
+        Resultado: "Se ejecutaría el caso de uso “Activar operativo de emergencia”. Llamada no crítica creada"
+                    Se crea la llamada no crítica como esLeve = false y el sistema se prepara para registrar otra llamada.
+
+    Prueba14
+        Entrada: Se resgistra el consejo.
+        Resultado: "Consejo guardado". Se registra el consejo y el sistema se prepara para recibir otro consejo.
+
